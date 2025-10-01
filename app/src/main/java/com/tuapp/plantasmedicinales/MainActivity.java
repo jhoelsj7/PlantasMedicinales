@@ -1,100 +1,40 @@
 package com.tuapp.plantasmedicinales;
 
-import android.content.Intent;  // ← AGREGAR ESTE
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.List;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import androidx.cardview.widget.CardView;
 
 public class MainActivity extends AppCompatActivity {
-
-    private TextView textViewResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        // Crear interfaz programáticamente
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(32, 32, 32, 32);
+        CardView cardViewPlants = findViewById(R.id.cardViewPlants);
+        CardView cardCamera = findViewById(R.id.cardCamera);
+        CardView cardSearch = findViewById(R.id.cardSearch);
 
-        TextView title = new TextView(this);
-        title.setText("🌿 Sistema de Plantas Medicinales");
-        title.setTextSize(24);
-        title.setPadding(0, 0, 0, 32);
-        layout.addView(title);
-
-        Button button = new Button(this);
-        button.setText("Cargar Plantas desde API");
-        button.setOnClickListener(v -> fetchPlants());
-        layout.addView(button);
-
-        // ← AGREGAR AQUÍ EL NUEVO CÓDIGO ↓
-        // Botón para identificar plantas con IA
-        Button cameraButton = new Button(this);
-        cameraButton.setText("📷 Identificar Planta con IA");
-        cameraButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, CameraActivity.class);
-            startActivity(intent);
-        });
-        layout.addView(cameraButton);
-        // ← HASTA AQUÍ ↑
-
-        ScrollView scrollView = new ScrollView(this);
-        textViewResult = new TextView(this);
-        textViewResult.setText("Presiona el botón para cargar las plantas");
-        textViewResult.setPadding(16, 16, 16, 16);
-        scrollView.addView(textViewResult);
-        layout.addView(scrollView);
-
-        setContentView(layout);
-    }
-
-    private void fetchPlants() {
-        textViewResult.setText("Cargando plantas...");
-
-        Call<List<Plant>> call = RetrofitClient.getInstance()
-                .getApiService()
-                .getAllPlants();
-
-        call.enqueue(new Callback<List<Plant>>() {
+        cardViewPlants.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<List<Plant>> call, Response<List<Plant>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Plant> plants = response.body();
-                    StringBuilder result = new StringBuilder();
-                    result.append("✅ Plantas encontradas: ").append(plants.size()).append("\n\n");
-
-                    for (Plant plant : plants) {
-                        result.append("🌱 ").append(plant.getCommon_name())
-                                .append("\n📚 ").append(plant.getScientific_name())
-                                .append("\n💊 Usos: ").append(plant.getMedicinal_uses())
-                                .append("\n\n");
-                    }
-
-                    textViewResult.setText(result.toString());
-                    Toast.makeText(MainActivity.this,
-                            "¡Conexión exitosa con la API!",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    textViewResult.setText("❌ Error al obtener datos");
-                }
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PlantListActivity.class));
             }
+        });
 
+        cardCamera.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(Call<List<Plant>> call, Throwable t) {
-                textViewResult.setText("❌ Error de conexión: " + t.getMessage());
-                Toast.makeText(MainActivity.this,
-                        "Error: Verifica que XAMPP esté corriendo",
-                        Toast.LENGTH_LONG).show();
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CameraActivity.class));
+            }
+        });
+
+        cardSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SearchActivity.class));
             }
         });
     }
