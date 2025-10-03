@@ -14,6 +14,11 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.PlantViewHol
     private List<Plant> plantList;
     private OnPlantClickListener listener;
 
+    // Añadir también OnItemClickListener para compatibilidad
+    public interface OnItemClickListener {
+        void onItemClick(Plant plant);
+    }
+
     public interface OnPlantClickListener {
         void onPlantClick(Plant plant);
     }
@@ -21,6 +26,17 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.PlantViewHol
     public PlantAdapter(List<Plant> plantList, OnPlantClickListener listener) {
         this.plantList = plantList;
         this.listener = listener;
+    }
+
+    // Constructor adicional para OnItemClickListener
+    public PlantAdapter(List<Plant> plantList, final OnItemClickListener itemListener) {
+        this.plantList = plantList;
+        this.listener = new OnPlantClickListener() {
+            @Override
+            public void onPlantClick(Plant plant) {
+                itemListener.onItemClick(plant);
+            }
+        };
     }
 
     @NonNull
@@ -40,6 +56,11 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.PlantViewHol
     @Override
     public int getItemCount() {
         return plantList.size();
+    }
+
+    public void updateList(List<Plant> newList) {
+        this.plantList = newList;
+        notifyDataSetChanged();
     }
 
     class PlantViewHolder extends RecyclerView.ViewHolder {
@@ -67,14 +88,27 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.PlantViewHol
         }
 
         public void bind(Plant plant) {
-            textPlantName.setText(plant.getCommon_name());
-            textScientificName.setText(plant.getScientific_name());
+            // Manejo de nombres con compatibilidad
+            String commonName = plant.getCommon_name();
+            if (commonName == null || commonName.isEmpty()) {
+                commonName = plant.getName();
+            }
+            textPlantName.setText(commonName != null ? commonName : "Sin nombre");
+
+            String scientificName = plant.getScientific_name();
+            if (scientificName == null || scientificName.isEmpty()) {
+                scientificName = plant.getScientificName();
+            }
+            textScientificName.setText(scientificName != null ? scientificName : "");
 
             String uses = plant.getMedicinal_uses();
+            if (uses == null || uses.isEmpty()) {
+                uses = plant.getMedicinalUses();
+            }
             if (uses != null && uses.length() > 100) {
                 uses = uses.substring(0, 97) + "...";
             }
-            textUses.setText(uses);
+            textUses.setText(uses != null ? uses : "");
 
             // Por ahora usar el icono por defecto
             plantIcon.setImageResource(R.mipmap.ic_launcher_round);

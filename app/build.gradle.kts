@@ -60,4 +60,10 @@ dependencies {
     // RecyclerView y CardView para listas
     implementation("androidx.recyclerview:recyclerview:1.3.1")
     implementation("androidx.cardview:cardview:1.0.0")
+
+
+    implementation("androidx.room:room-runtime:2.5.2")
+    annotationProcessor("androidx.room:room-compiler:2.5.2")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    implementation("com.karumi:dexter:6.2.3")
 }

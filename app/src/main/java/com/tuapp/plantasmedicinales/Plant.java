@@ -1,69 +1,67 @@
 package com.tuapp.plantasmedicinales;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "plants")
 public class Plant {
+    @PrimaryKey(autoGenerate = true)
     private int id;
-    private String scientific_name;
+    private String name;
+    private String scientificName;
     private String common_name;
+    private String scientific_name;
     private String family;
     private String description;
+    private String medicinalUses;
     private String medicinal_uses;
-    private String created_at;
-    private String updated_at;
+    private String preparation;
+    private String precautions;
+    private String imageUrl;
+    private String localImagePath;
+    private boolean isSynced;
 
-    // Constructor vacío
-    public Plant() {}
+    // Getters y setters para ambos formatos
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; this.common_name = name; }
 
-    // Constructor completo
-    public Plant(int id, String scientific_name, String common_name,
-                 String family, String description, String medicinal_uses) {
-        this.id = id;
-        this.scientific_name = scientific_name;
-        this.common_name = common_name;
-        this.family = family;
-        this.description = description;
-        this.medicinal_uses = medicinal_uses;
-    }
+    public String getCommon_name() { return common_name != null ? common_name : name; }
+    public void setCommon_name(String common_name) { this.common_name = common_name; this.name = common_name; }
 
-    // Getters
-    public int getId() { return id; }
-    public String getScientific_name() { return scientific_name; }
-    public String getCommon_name() { return common_name; }
+    public String getScientificName() { return scientificName; }
+    public void setScientificName(String scientificName) { this.scientificName = scientificName; this.scientific_name = scientificName; }
+
+    public String getScientific_name() { return scientific_name != null ? scientific_name : scientificName; }
+    public void setScientific_name(String scientific_name) { this.scientific_name = scientific_name; this.scientificName = scientific_name; }
+
     public String getFamily() { return family; }
+    public void setFamily(String family) { this.family = family; }
+
+    public String getMedicinalUses() { return medicinalUses; }
+    public void setMedicinalUses(String medicinalUses) { this.medicinalUses = medicinalUses; this.medicinal_uses = medicinalUses; }
+
+    public String getMedicinal_uses() { return medicinal_uses != null ? medicinal_uses : medicinalUses; }
+    public void setMedicinal_uses(String medicinal_uses) { this.medicinal_uses = medicinal_uses; this.medicinalUses = medicinal_uses; }
+
+    // Resto de getters y setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
     public String getDescription() { return description; }
-    public String getMedicinal_uses() { return medicinal_uses; }
-    public String getCreated_at() { return created_at; }
-    public String getUpdated_at() { return updated_at; }
+    public void setDescription(String description) { this.description = description; }
 
-    // SETTERS - ESTOS SON LOS QUE FALTAN
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getPreparation() { return preparation; }
+    public void setPreparation(String preparation) { this.preparation = preparation; }
 
-    public void setScientific_name(String scientific_name) {
-        this.scientific_name = scientific_name;
-    }
+    public String getPrecautions() { return precautions; }
+    public void setPrecautions(String precautions) { this.precautions = precautions; }
 
-    public void setCommon_name(String common_name) {
-        this.common_name = common_name;
-    }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public void setFamily(String family) {
-        this.family = family;
-    }
+    public String getLocalImagePath() { return localImagePath; }
+    public void setLocalImagePath(String localImagePath) { this.localImagePath = localImagePath; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setMedicinal_uses(String medicinal_uses) {
-        this.medicinal_uses = medicinal_uses;
-    }
-
-    public void setCreated_at(String created_at) {
-        this.created_at = created_at;
-    }
-
-    public void setUpdated_at(String updated_at) {
-        this.updated_at = updated_at;
-    }
+    public boolean isSynced() { return isSynced; }
+    public void setSynced(boolean synced) { isSynced = synced; }
 }
