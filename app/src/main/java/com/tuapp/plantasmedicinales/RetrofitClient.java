@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class RetrofitClient {
 
     // USA TU IP LOCAL DE WIFI
-    private static final String BASE_URL = "http://192.168.18.26/plantas_api/";
+    private static final String BASE_URL = "http://192.168.18.24/plantas_api/api/";
 
     private static Retrofit retrofit = null;
 

@@ -9,22 +9,24 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.tuapp.plantasmedicinales.database.AppDatabase;
+import com.tuapp.plantasmedicinales.database.PlantDao;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SearchActivity extends AppCompatActivity implements PlantAdapter.OnPlantClickListener {
+public class SearchActivity extends BaseActivity implements PlantAdapter.OnPlantClickListener {
 
     private EditText searchEditText;
     private RecyclerView recyclerView;
     private PlantAdapter adapter;
     private ProgressBar progressBar;
     private TextView emptyText;
+    private android.widget.ImageButton btnBack;
 
     private List<Plant> allPlants = new ArrayList<>();
     private List<Plant> filteredPlants = new ArrayList<>();
@@ -34,13 +36,19 @@ public class SearchActivity extends AppCompatActivity implements PlantAdapter.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        setTitle("Buscar Planta");
-
         // Inicializar vistas
         searchEditText = findViewById(R.id.searchEditText);
         recyclerView = findViewById(R.id.recyclerViewSearch);
         progressBar = findViewById(R.id.progressBarSearch);
         emptyText = findViewById(R.id.emptyTextView);
+        btnBack = findViewById(R.id.btnBack);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // Configurar RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -69,9 +77,31 @@ public class SearchActivity extends AppCompatActivity implements PlantAdapter.On
         progressBar.setVisibility(View.VISIBLE);
         emptyText.setVisibility(View.GONE);
 
-        // Cargar datos de prueba directamente
-        loadDummyData();
-        progressBar.setVisibility(View.GONE);
+        // Cargar plantas desde la base de datos local
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PlantDao plantDao = AppDatabase.getInstance(SearchActivity.this).plantDao();
+                final List<Plant> plants = plantDao.getAllPlants();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        if (plants != null && !plants.isEmpty()) {
+                            allPlants.clear();
+                            allPlants.addAll(plants);
+                            filteredPlants.clear();
+                            filteredPlants.addAll(plants);
+                            adapter.updateList(filteredPlants);
+                        } else {
+                            emptyText.setVisibility(View.VISIBLE);
+                            emptyText.setText("No hay plantas. Sincroniza desde la lista de plantas.");
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 
     private void loadDummyData() {
@@ -186,6 +216,15 @@ public class SearchActivity extends AppCompatActivity implements PlantAdapter.On
     }
 
     @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onPlantClick(Plant plant) {
         Intent intent = new Intent(this, PlantDetailActivity.class);
         intent.putExtra("plant_id", plant.getId());
@@ -194,6 +233,7 @@ public class SearchActivity extends AppCompatActivity implements PlantAdapter.On
         intent.putExtra("plant_family", plant.getFamily());
         intent.putExtra("plant_description", plant.getDescription());
         intent.putExtra("plant_uses", plant.getMedicinal_uses());
+        intent.putExtra("plant_image_url", plant.getImageUrl());
         startActivity(intent);
     }
 }

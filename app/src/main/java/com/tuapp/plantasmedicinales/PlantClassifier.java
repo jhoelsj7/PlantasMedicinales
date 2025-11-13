@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.util.Log;
 import org.tensorflow.lite.Interpreter;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -20,14 +21,15 @@ import java.util.PriorityQueue;
 
 public class PlantClassifier {
 
-    private static final String MODEL_PATH = "modelo_plantas_96acc.tflite";
+    private static final String TAG = "PlantClassifier";
+    private static final String MODEL_PATH = "plantas_medicinales_final.tflite";
     private static final String LABEL_PATH = "labels.txt";
-    private static final int INPUT_SIZE = 224;
+    private static final int INPUT_SIZE = 224; // Cambio crítico: El modelo espera 224x224
     private static final int PIXEL_SIZE = 3;
     private static final int IMAGE_MEAN = 128;
     private static final float IMAGE_STD = 128.0f;
     private static final int MAX_RESULTS = 3;
-    private static final float THRESHOLD = 0.1f;
+    private static final float THRESHOLD = 0.01f; // Reducido a 1%
 
     private Context context;
     private Interpreter interpreter;
@@ -38,12 +40,29 @@ public class PlantClassifier {
     public PlantClassifier(Context context) {
         this.context = context;
         try {
-            interpreter = new Interpreter(loadModelFile());
+            Log.d(TAG, "Iniciando carga del modelo...");
+            MappedByteBuffer modelFile = loadModelFile();
+            Log.d(TAG, "Archivo del modelo cargado, tamaño: " + modelFile.capacity() + " bytes");
+
+            interpreter = new Interpreter(modelFile);
+            Log.d(TAG, "Interpreter creado exitosamente");
+
+            // Verificar el tamaño de entrada esperado por el modelo
+            int[] inputShape = interpreter.getInputTensor(0).shape();
+            Log.d(TAG, "Forma de entrada del modelo: [" + inputShape[0] + ", " + inputShape[1] + ", " + inputShape[2] + ", " + inputShape[3] + "]");
+            Log.d(TAG, "INPUT_SIZE configurado: " + INPUT_SIZE);
+
             labelList = loadLabelList();
+            Log.d(TAG, "Labels cargadas: " + labelList.size());
+
             intValues = new int[INPUT_SIZE * INPUT_SIZE];
             outputArray = new float[1][labelList.size()];
+            Log.d(TAG, "Modelo cargado exitosamente. Plantas: " + labelList.size());
         } catch (Exception e) {
+            Log.e(TAG, "Error al cargar modelo: " + e.getMessage());
             e.printStackTrace();
+            // Asegurarse de que interpreter queda null si hay error
+            interpreter = null;
         }
     }
 
@@ -71,14 +90,39 @@ public class PlantClassifier {
 
     public List<Recognition> recognizeImage(Bitmap bitmap) {
         if (bitmap == null) {
+            Log.e(TAG, "Imagen es null");
             return new ArrayList<>();
         }
 
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, INPUT_SIZE, INPUT_SIZE, false);
-        ByteBuffer byteBuffer = convertBitmapToByteBuffer(scaledBitmap);
+        if (interpreter == null) {
+            Log.e(TAG, "Interpreter es null - modelo no se cargó correctamente");
+            return new ArrayList<>();
+        }
 
-        if (interpreter != null) {
+        if (labelList == null || labelList.isEmpty()) {
+            Log.e(TAG, "Lista de labels es null o vacía");
+            return new ArrayList<>();
+        }
+
+        try {
+            Log.d(TAG, "Escalando imagen de " + bitmap.getWidth() + "x" + bitmap.getHeight() + " a " + INPUT_SIZE + "x" + INPUT_SIZE);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, INPUT_SIZE, INPUT_SIZE, false);
+
+            Log.d(TAG, "Convirtiendo imagen a ByteBuffer...");
+            ByteBuffer byteBuffer = convertBitmapToByteBuffer(scaledBitmap);
+
+            Log.d(TAG, "Ejecutando inferencia con el modelo...");
             interpreter.run(byteBuffer, outputArray);
+
+            // Log de todas las confianzas
+            Log.d(TAG, "=== Resultados de predicción ===");
+            for (int i = 0; i < labelList.size(); i++) {
+                Log.d(TAG, labelList.get(i) + ": " + String.format("%.4f", outputArray[0][i]));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error durante la inferencia: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
         }
 
         return getSortedResult();
@@ -128,6 +172,12 @@ public class PlantClassifier {
         int recognitionsSize = Math.min(pq.size(), MAX_RESULTS);
         for (int i = 0; i < recognitionsSize; ++i) {
             recognitions.add(pq.poll());
+        }
+
+        Log.d(TAG, "Resultados filtrados: " + recognitions.size() + " de " + labelList.size());
+        if (!recognitions.isEmpty()) {
+            Log.d(TAG, "Top resultado: " + recognitions.get(0).getTitle() +
+                  " con confianza " + String.format("%.2f%%", recognitions.get(0).getConfidence() * 100));
         }
 
         return recognitions;

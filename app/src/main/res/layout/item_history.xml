@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_card"
+    android:padding="16dp"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Imagen de la planta -->
+    <ImageView
+        android:id="@+id/ivHistoryPlant"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_launcher"
+        android:contentDescription="Imagen de planta identificada"/>
+
+    <!-- Información -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_gravity="center_vertical">
+
+        <!-- Nombre de la planta -->
+        <TextView
+            android:id="@+id/tvHistoryPlantName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre de la planta"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/green_primary_dark"
+            android:layout_marginBottom="4dp"/>
+
+        <!-- Confianza -->
+        <TextView
+            android:id="@+id/tvHistoryConfidence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confianza: 95%"
+            android:textSize="14sp"
+            android:textColor="@color/green_accent"
+            android:layout_marginBottom="4dp"/>
+
+        <!-- Fecha y hora -->
+        <TextView
+            android:id="@+id/tvHistoryDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15 Ene 2025, 10:30 AM"
+            android:textSize="12sp"
+            android:textColor="@color/grey_medium"/>
+    </LinearLayout>
+
+    <!-- Botón eliminar -->
+    <ImageButton
+        android:id="@+id/btnDeleteHistory"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Eliminar del historial"
+        android:tint="@color/error"/>
+
+</LinearLayout>

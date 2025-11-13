@@ -1,66 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:fillViewport="true"
+    android:background="@color/green_light_bg">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Resultado de Identificación"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <ImageView
-        android:id="@+id/ivPlantImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_background"
-        android:layout_marginBottom="16dp"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
-    <TextView
-        android:id="@+id/tvPlantName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Nombre de la planta"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="8dp"/>
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@android:drawable/ic_menu_revert"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Regresar a pantalla anterior"
+                android:tint="@color/green_primary_dark"/>
 
-    <TextView
-        android:id="@+id/tvScientificName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Nombre científico"
-        android:textStyle="italic"
-        android:gravity="center"
-        android:layout_marginBottom="8dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Resultado"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/green_primary_dark"/>
+        </RelativeLayout>
 
-    <TextView
-        android:id="@+id/tvConfidence"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Confianza: 0%"
-        android:gravity="center"
-        android:layout_marginBottom="24dp"/>
+        <ImageView
+            android:id="@+id/ivPlantImage"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_card"
+            android:src="@drawable/ic_launcher_background"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="Imagen de la planta identificada"
+            android:adjustViewBounds="true"/>
 
-    <Button
-        android:id="@+id/btnViewDetails"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ver Detalles"
-        android:layout_marginBottom="8dp"/>
+        <TextView
+            android:id="@+id/tvPlantName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre de la planta"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/green_primary_dark"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
 
-    <Button
-        android:id="@+id/btnTryAgain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Intentar de Nuevo"/>
+        <TextView
+            android:id="@+id/tvScientificName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre científico"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:textColor="@color/brown_earth"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvConfidence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Confianza: 0%"
+            android:textSize="16sp"
+            android:textColor="@color/grey_dark"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:id="@+id/tvRecommendation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recomendación"
+            android:textSize="15sp"
+            android:textColor="@color/grey_dark"
+            android:gravity="center"
+            android:layout_marginBottom="32dp"/>
+
+        <Button
+            android:id="@+id/btnViewDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ver Detalles"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_primary"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnTryAgain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Intentar de Nuevo"
+            android:textColor="@color/green_primary_dark"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_secondary"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
+</ScrollView>

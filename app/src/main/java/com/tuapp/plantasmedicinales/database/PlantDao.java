@@ -13,6 +13,9 @@ public interface PlantDao {
     @Query("SELECT * FROM plants")
     List<Plant> getAllPlants();
 
+    @Query("SELECT * FROM plants")
+    List<Plant> getAllPlantsSync();
+
     @Query("SELECT * FROM plants WHERE id = :id")
     Plant getPlantById(int id);
 
@@ -21,6 +24,9 @@ public interface PlantDao {
 
     @Insert
     void insertPlant(Plant plant);
+
+    @Insert
+    void insert(Plant plant);
 
     @Insert
     void insertPlants(List<Plant> plants);

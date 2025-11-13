@@ -1,48 +1,425 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
+    android:background="#F5F7F0">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Plantas Medicinales"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="32dp"/>
-
-    <Button
-        android:id="@+id/btnCamera"
+    <!-- TOOLBAR - AJUSTA paddingTop PARA BAJAR TODO EL TOOLBAR -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Identificar Planta"
-        android:layout_marginBottom="16dp"
-        android:padding="16dp"/>
+        android:background="@android:color/transparent"
+        android:paddingTop="24dp"
+        app:elevation="0dp">
 
-    <Button
-        android:id="@+id/btnPlantList"
+        <!--
+        ⬇️ PARA BAJAR TODO EL TOOLBAR (título + menú de 3 puntos):
+        Cambia el número en: android:paddingTop="24dp"
+
+        Valores recomendados:
+        - 16dp = Poco espacio arriba
+        - 20dp = Espacio normal
+        - 24dp = Buen espacio (ACTUAL)
+        - 28dp = Más espacio
+        - 32dp = Mucho espacio
+        - 40dp = Espacio grande
+        -->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <!-- Título centrado verticalmente -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:text="Plantas\nMedicinales"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#2C3E50"
+                android:lineSpacingExtra="0dp"/>
+
+            <!-- Menú de 3 puntos - AJUSTA EL MARGEN ABAJO -->
+            <ImageView
+                android:id="@+id/btnMenu"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="17dp"
+                android:src="@drawable/ic_more_vert"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Menú"
+                app:tint="#2C3E50"/>
+
+            <!--
+            ⚙️ PARA AJUSTAR LA POSICIÓN DEL MENÚ (3 PUNTOS):
+            Cambia el número en la línea: android:layout_marginTop="16dp"
+
+            Prueba estos valores:
+            - 12dp = Muy arriba
+            - 16dp = Arriba (ACTUAL)
+            - 20dp = Medio
+            - 24dp = Más abajo
+            - 28dp = Abajo
+            - 32dp = Muy abajo
+
+            Después de cambiar, guarda y ejecuta: ./gradlew assembleDebug
+            -->
+
+        </RelativeLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ScrollView con contenido -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lista de Plantas"
-        android:layout_marginBottom="16dp"
-        android:padding="16dp"/>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingBottom="80dp">
 
-    <Button
-        android:id="@+id/btnSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Buscar"
-        android:layout_marginBottom="16dp"
-        android:padding="16dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-    <Button
-        android:id="@+id/btnSync"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sincronizar Datos"
-        android:padding="16dp"/>
+            <!-- Banner promocional -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/white">
 
-</LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌿 Descubre nuevas plantas"
+                            android:textSize="13sp"
+                            android:textColor="#7F8C8D"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Identifica con tu cámara"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="#2C3E50"
+                            android:layout_marginTop="2dp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="🌱"
+                        android:textSize="32sp"
+                        android:gravity="center"
+                        android:layout_marginStart="12dp"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card 1: Identificar Planta -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnCamera"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_mint_card"
+                    android:padding="20dp">
+
+                    <!-- Iconos superiores -->
+                    <ImageView
+                        android:id="@+id/iconCameraTop"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_camera"
+                        android:contentDescription="Cámara"
+                        app:tint="#4A7C59"/>
+
+                    <ImageView
+                        android:id="@+id/menuIdentificar"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_more_vert"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Más opciones"
+                        app:tint="#4A7C59"/>
+
+                    <!-- Título -->
+                    <TextView
+                        android:id="@+id/titleIdentificar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/iconCameraTop"
+                        android:layout_marginTop="12dp"
+                        android:text="📷 Identificar Planta"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#2C3E50"/>
+
+                    <!-- Descripción e icono abajo -->
+                    <TextView
+                        android:id="@+id/descIdentificar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:text="Reconoce plantas con IA"
+                        android:textSize="13sp"
+                        android:textColor="#5A6C7D"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:text="🔍"
+                        android:textSize="28sp"/>
+
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card 2: Lista de Plantas -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnPlantList"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_coral_card"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:id="@+id/iconListTop"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_list"
+                        android:contentDescription="Lista"
+                        app:tint="@color/white"/>
+
+                    <ImageView
+                        android:id="@+id/menuLista"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_more_vert"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Más opciones"
+                        app:tint="@color/white"/>
+
+                    <TextView
+                        android:id="@+id/titleLista"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/iconListTop"
+                        android:layout_marginTop="12dp"
+                        android:text="📚 Lista de Plantas"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:text="125 plantas guardadas"
+                        android:textSize="13sp"
+                        android:textColor="@color/white"
+                        android:alpha="0.95"/>
+
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card 3: Buscar -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnSearch"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_blue_card"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:id="@+id/iconSearchTop"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_search"
+                        android:contentDescription="Buscar"
+                        app:tint="@color/white"/>
+
+                    <ImageView
+                        android:id="@+id/menuBuscar"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_more_vert"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Más opciones"
+                        app:tint="@color/white"/>
+
+                    <TextView
+                        android:id="@+id/titleBuscar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/iconSearchTop"
+                        android:layout_marginTop="12dp"
+                        android:text="🔍 Buscar"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:text="Encuentra por nombre"
+                        android:textSize="13sp"
+                        android:textColor="@color/white"
+                        android:alpha="0.95"/>
+
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card 4: Sincronizar -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnSync"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_beige_card"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:id="@+id/iconSyncTop"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_sync"
+                        android:contentDescription="Sincronizar"
+                        app:tint="#6B5D4F"/>
+
+                    <ImageView
+                        android:id="@+id/menuSync"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_more_vert"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Más opciones"
+                        app:tint="#6B5D4F"/>
+
+                    <LinearLayout
+                        android:id="@+id/titleSync"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/iconSyncTop"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌱 Sincronizar"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="#2C3E50"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NEW"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:background="@drawable/bg_new_badge"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:paddingTop="3dp"
+                            android:paddingBottom="3dp"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:text="Última sync: Hoy"
+                        android:textSize="13sp"
+                        android:textColor="#6B5D4F"/>
+
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

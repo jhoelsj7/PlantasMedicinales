@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.tuapp.plantasmedicinales.utils.ImageUtils;
 import java.util.List;
 
 public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.PlantViewHolder> {
@@ -110,8 +111,12 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.PlantViewHol
             }
             textUses.setText(uses != null ? uses : "");
 
-            // Por ahora usar el icono por defecto
-            plantIcon.setImageResource(R.mipmap.ic_launcher_round);
+            // Cargar imagen con Glide si existe URL, sino usar icono por defecto
+            if (plant.getImageUrl() != null && !plant.getImageUrl().isEmpty()) {
+                ImageUtils.loadPlantImageCircular(itemView.getContext(), plant.getImageUrl(), plantIcon);
+            } else {
+                plantIcon.setImageResource(R.mipmap.ic_launcher_round);
+            }
         }
     }
 }

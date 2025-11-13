@@ -6,6 +6,7 @@ import com.tuapp.plantasmedicinales.Plant;
 import com.tuapp.plantasmedicinales.RetrofitClient;
 import com.tuapp.plantasmedicinales.database.AppDatabase;
 import com.tuapp.plantasmedicinales.database.PlantDao;
+import com.tuapp.plantasmedicinales.model.PlantsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,7 +29,8 @@ public class PlantService {
         call.enqueue(new Callback<List<Plant>>() {
             @Override
             public void onResponse(Call<List<Plant>> call, Response<List<Plant>> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    // El dashboard devuelve array directo, no wrapper
                     savePlantsToDatabase(response.body(), callback);
                 } else {
                     loadPlantsFromDatabase(callback);
