@@ -1,0 +1,216 @@
+{
+	"info": {
+		"_postman_id": "plantas-medicinales-001",
+		"name": "Plantas Medicinales API - Testing Tesis",
+		"description": "Colección de tests para API REST de la aplicación Plantas Medicinales.\nCreada para documentación de tesis.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CP5.1 - GET Listar Todas las Plantas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/plants.php",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"plants.php"
+					]
+				},
+				"description": "**Objetivo:** Obtener lista completa de todas las plantas medicinales en la base de datos.\n\n**Resultado Esperado:**\n- Status Code: 200 OK\n- Response: JSON con array de plantas\n\n**Para tu tesis:**\n1. Ejecuta este request\n2. Verifica que el Status sea 200\n3. Captura pantalla mostrando el JSON de respuesta\n4. Cuenta cuántas plantas retorna"
+			},
+			"response": []
+		},
+		{
+			"name": "CP5.2 - GET Buscar Planta Específica",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/plants.php?search=manzanilla",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"plants.php"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "manzanilla",
+							"description": "Término de búsqueda"
+						}
+					]
+				},
+				"description": "**Objetivo:** Buscar plantas por nombre común o científico.\n\n**Resultado Esperado:**\n- Status Code: 200 OK\n- Response: Array con plantas que coinciden\n\n**Pruebas adicionales:**\n- Cambia 'manzanilla' por 'muña'\n- Cambia por 'aloe'\n- Prueba con búsqueda vacía"
+			},
+			"response": []
+		},
+		{
+			"name": "CP5.3 - POST Registrar Identificación",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_id\": 1,\n    \"plant_id\": 5,\n    \"confidence\": 0.95,\n    \"image_path\": \"/storage/test_image.jpg\",\n    \"identified_at\": \"2025-11-13 10:30:00\"\n}"
+				},
+				"url": {
+					"raw": "{{API_URL}}/identifications.php",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"identifications.php"
+					]
+				},
+				"description": "**Objetivo:** Registrar una nueva identificación de planta realizada por el modelo IA.\n\n**Resultado Esperado:**\n- Status Code: 201 Created\n- Response: JSON con ID de la identificación creada\n\n**Datos de prueba:**\n- user_id: ID del usuario que hizo la identificación\n- plant_id: ID de la planta identificada\n- confidence: Nivel de confianza del modelo (0.0 a 1.0)\n- image_path: Ruta de la imagen procesada"
+			},
+			"response": []
+		},
+		{
+			"name": "CP5.4 - GET Estado de Sincronización",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/sync_status.php?last_sync=2024-01-01",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"sync_status.php"
+					],
+					"query": [
+						{
+							"key": "last_sync",
+							"value": "2024-01-01",
+							"description": "Fecha de última sincronización"
+						}
+					]
+				},
+				"description": "**Objetivo:** Verificar si hay datos nuevos o actualizados desde la última sincronización.\n\n**Resultado Esperado:**\n- Status Code: 200 OK\n- Response: JSON con datos nuevos o actualizados\n\n**Funcionalidad:**\nPermite a la app móvil sincronizar solo los cambios recientes, optimizando el uso de datos."
+			},
+			"response": []
+		},
+		{
+			"name": "CP5.5 - GET Obtener Planta por ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/plants.php?id=5",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"plants.php"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "5",
+							"description": "ID de la planta"
+						}
+					]
+				},
+				"description": "**Objetivo:** Obtener información detallada de una planta específica.\n\n**Resultado Esperado:**\n- Status Code: 200 OK\n- Response: JSON con detalles completos de la planta\n\n**Información incluida:**\n- Nombre científico y común\n- Familia botánica\n- Propiedades medicinales\n- Usos tradicionales\n- Imagen"
+			},
+			"response": []
+		},
+		{
+			"name": "CP5.6 - POST Login de Usuario",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+				},
+				"url": {
+					"raw": "{{API_URL}}/login.php",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"login.php"
+					]
+				},
+				"description": "**Objetivo:** Autenticar usuario en el sistema.\n\n**Resultado Esperado - Login Exitoso:**\n- Status Code: 200 OK\n- Response:\n```json\n{\n    \"success\": true,\n    \"token\": \"jwt_token_aqui\",\n    \"user\": {\n        \"id\": 1,\n        \"username\": \"admin\"\n    }\n}\n```\n\n**Pruebas adicionales:**\n1. Credenciales correctas (admin/admin123)\n2. Credenciales incorrectas\n3. Username vacío\n4. Password vacío"
+			},
+			"response": []
+		},
+		{
+			"name": "CP5.7 - GET Historial de Identificaciones",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/identifications.php?user_id=1",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"identifications.php"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "1",
+							"description": "ID del usuario"
+						}
+					]
+				},
+				"description": "**Objetivo:** Obtener historial de identificaciones de un usuario.\n\n**Resultado Esperado:**\n- Status Code: 200 OK\n- Response: Array con identificaciones realizadas\n\n**Datos incluidos:**\n- Fecha y hora de identificación\n- Planta identificada\n- Nivel de confianza\n- Imagen utilizada"
+			},
+			"response": []
+		},
+		{
+			"name": "CP5.8 - GET Plantas por Familia",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/plants.php?family=Asteraceae",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"plants.php"
+					],
+					"query": [
+						{
+							"key": "family",
+							"value": "Asteraceae",
+							"description": "Nombre de la familia botánica"
+						}
+					]
+				},
+				"description": "**Objetivo:** Filtrar plantas por familia botánica.\n\n**Resultado Esperado:**\n- Status Code: 200 OK\n- Response: Array con plantas de la familia especificada\n\n**Familias para probar:**\n- Asteraceae (manzanilla)\n- Lamiaceae (muña)\n- Asphodelaceae (aloe)"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "API_URL",
+			"value": "http://localhost/api",
+			"type": "string"
+		}
+	]
+}
