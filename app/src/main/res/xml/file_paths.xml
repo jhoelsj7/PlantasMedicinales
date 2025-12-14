@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Directorio de caché interno de la app -->
+    <cache-path name="cache" path="." />
+    
+    <!-- Directorio de archivos internos -->
+    <files-path name="files" path="." />
+    
+    <!-- Directorio de imágenes -->
+    <files-path name="images" path="images/" />
+</paths>
+

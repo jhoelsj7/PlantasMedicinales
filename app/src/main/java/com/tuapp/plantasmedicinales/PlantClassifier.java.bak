@@ -24,34 +24,12 @@ public class PlantClassifier {
     private static final String TAG = "PlantClassifier";
     private static final String MODEL_PATH = "plantas_medicinales_final.tflite";
     private static final String LABEL_PATH = "labels.txt";
-    private static final int INPUT_SIZE = 224;
+    private static final int INPUT_SIZE = 224; // Cambio crítico: El modelo espera 224x224
     private static final int PIXEL_SIZE = 3;
     private static final int IMAGE_MEAN = 128;
     private static final float IMAGE_STD = 128.0f;
-    private static final int MAX_RESULTS = 5;
-    private static final float THRESHOLD = 0.01f;
-
-    // Umbrales de confianza para filtrar objetos no reconocidos
-    public static final float THRESHOLD_IDENTIFICADO = 0.50f;  // >= 50% = Identificado
-    public static final float THRESHOLD_POSIBLE = 0.30f;       // 30-50% = Posible
-
-    // Estados de identificacion
-    public enum EstadoIdentificacion {
-        IDENTIFICADO,      // >= 50% - Alta confianza
-        POSIBLE,           // 30-50% - Confianza media
-        NO_RECONOCIDO      // < 30% - No es una planta reconocida
-    }
-
-    // Metodo estatico para determinar el estado segun la confianza
-    public static EstadoIdentificacion getEstado(float confidence) {
-        if (confidence >= THRESHOLD_IDENTIFICADO) {
-            return EstadoIdentificacion.IDENTIFICADO;
-        } else if (confidence >= THRESHOLD_POSIBLE) {
-            return EstadoIdentificacion.POSIBLE;
-        } else {
-            return EstadoIdentificacion.NO_RECONOCIDO;
-        }
-    }
+    private static final int MAX_RESULTS = 3;
+    private static final float THRESHOLD = 0.01f; // Reducido a 1%
 
     private Context context;
     private Interpreter interpreter;
@@ -64,11 +42,12 @@ public class PlantClassifier {
         try {
             Log.d(TAG, "Iniciando carga del modelo...");
             MappedByteBuffer modelFile = loadModelFile();
-            Log.d(TAG, "Archivo del modelo cargado, tamano: " + modelFile.capacity() + " bytes");
+            Log.d(TAG, "Archivo del modelo cargado, tamaño: " + modelFile.capacity() + " bytes");
 
             interpreter = new Interpreter(modelFile);
             Log.d(TAG, "Interpreter creado exitosamente");
 
+            // Verificar el tamaño de entrada esperado por el modelo
             int[] inputShape = interpreter.getInputTensor(0).shape();
             Log.d(TAG, "Forma de entrada del modelo: [" + inputShape[0] + ", " + inputShape[1] + ", " + inputShape[2] + ", " + inputShape[3] + "]");
             Log.d(TAG, "INPUT_SIZE configurado: " + INPUT_SIZE);
@@ -82,6 +61,7 @@ public class PlantClassifier {
         } catch (Exception e) {
             Log.e(TAG, "Error al cargar modelo: " + e.getMessage());
             e.printStackTrace();
+            // Asegurarse de que interpreter queda null si hay error
             interpreter = null;
         }
     }
@@ -115,12 +95,12 @@ public class PlantClassifier {
         }
 
         if (interpreter == null) {
-            Log.e(TAG, "Interpreter es null - modelo no se cargo correctamente");
+            Log.e(TAG, "Interpreter es null - modelo no se cargó correctamente");
             return new ArrayList<>();
         }
 
         if (labelList == null || labelList.isEmpty()) {
-            Log.e(TAG, "Lista de labels es null o vacia");
+            Log.e(TAG, "Lista de labels es null o vacía");
             return new ArrayList<>();
         }
 
@@ -134,7 +114,8 @@ public class PlantClassifier {
             Log.d(TAG, "Ejecutando inferencia con el modelo...");
             interpreter.run(byteBuffer, outputArray);
 
-            Log.d(TAG, "=== Resultados de prediccion ===");
+            // Log de todas las confianzas
+            Log.d(TAG, "=== Resultados de predicción ===");
             for (int i = 0; i < labelList.size(); i++) {
                 Log.d(TAG, labelList.get(i) + ": " + String.format("%.4f", outputArray[0][i]));
             }
@@ -209,18 +190,16 @@ public class PlantClassifier {
         }
     }
 
-    // Clase interna Recognition con estado de identificacion
+    // Clase interna Recognition
     public class Recognition {
         private final String id;
         private final String title;
         private final float confidence;
-        private final EstadoIdentificacion estado;
 
         public Recognition(String id, String title, float confidence) {
             this.id = id;
             this.title = title;
             this.confidence = confidence;
-            this.estado = PlantClassifier.getEstado(confidence);
         }
 
         public String getId() {
@@ -235,21 +214,9 @@ public class PlantClassifier {
             return confidence;
         }
 
-        public EstadoIdentificacion getEstado() {
-            return estado;
-        }
-
-        public boolean esPlantaReconocida() {
-            return estado != EstadoIdentificacion.NO_RECONOCIDO;
-        }
-
-        public boolean esIdentificacionSegura() {
-            return estado == EstadoIdentificacion.IDENTIFICADO;
-        }
-
         @Override
         public String toString() {
-            return "Title = " + title + ", Confidence = " + confidence + ", Estado = " + estado;
+            return "Title = " + title + ", Confidence = " + confidence;
         }
     }
 }

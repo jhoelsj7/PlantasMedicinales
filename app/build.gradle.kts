@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.tuapp.plantasmedicinales"
-    compileSdk = 36
+    compileSdk = 34
 
     aaptOptions {
         noCompress("tflite")
@@ -26,12 +26,19 @@ android {
                 }
             }
         }
+        // Configuración para tests instrumentados (muestra cada test individual)
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
+    // Configuración adicional para ver logs de tests instrumentados
+    adbOptions {
+        timeOutInMs = 10 * 60 * 1000  // 10 minutos timeout
     }
 
     defaultConfig {
         applicationId = "com.tuapp.plantasmedicinales"
         minSdk = 21
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -93,6 +100,9 @@ dependencies {
     // Retrofit Testing
     testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
+
+    // Test Orchestrator para salida detallada
+    androidTestUtil("androidx.test:orchestrator:1.4.2")
     implementation("org.tensorflow:tensorflow-lite:2.17.0")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4") {
         exclude(group = "org.tensorflow", module = "tensorflow-lite")

@@ -2,7 +2,9 @@ package com.tuapp.plantasmedicinales;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -11,18 +13,28 @@ import com.tuapp.plantasmedicinales.database.DatabaseHelper;
 import com.tuapp.plantasmedicinales.database.AppDatabase;
 import com.tuapp.plantasmedicinales.database.PlantDao;
 import com.tuapp.plantasmedicinales.service.AuthService;
+import com.tuapp.plantasmedicinales.service.PredictionService;
+import com.tuapp.plantasmedicinales.model.PredictionResponse;
 import com.tuapp.plantasmedicinales.utils.ImageUtils;
+import android.widget.Toast;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ResultActivity extends BaseActivity {
 
+    private static final String TAG = "ResultActivity";
+    
     private ImageView ivPlantImage;
     private TextView tvPlantName, tvConfidence, tvScientificName, tvRecommendation;
     private Button btnViewDetails, btnTryAgain;
     private android.widget.ImageButton btnBack;
     private DatabaseHelper dbHelper;
     private AuthService authService;
+    private PredictionService predictionService;
+
+    private Bitmap loadedImage;
+    private String imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +43,7 @@ public class ResultActivity extends BaseActivity {
 
         dbHelper = new DatabaseHelper(this);
         authService = new AuthService(this);
+        predictionService = new PredictionService(this);
 
         ivPlantImage = findViewById(R.id.ivPlantImage);
         tvPlantName = findViewById(R.id.tvPlantName);
@@ -50,33 +63,45 @@ public class ResultActivity extends BaseActivity {
 
         final String plantName = getIntent().getStringExtra("plant_name");
         final float confidence = getIntent().getFloatExtra("confidence", 0);
-        final Bitmap capturedImage = getIntent().getParcelableExtra("captured_image");
+        imagePath = getIntent().getStringExtra("image_path");
 
-        // Mostrar imagen capturada si está disponible
-        if (capturedImage != null) {
-            ivPlantImage.setImageBitmap(capturedImage);
+        // Cargar imagen desde la ruta del archivo
+        if (imagePath != null && new File(imagePath).exists()) {
+            Log.d(TAG, "Cargando imagen desde: " + imagePath);
+            loadedImage = loadBitmapFromPath(imagePath);
+            if (loadedImage != null) {
+                ivPlantImage.setImageBitmap(loadedImage);
+            } else {
+                ivPlantImage.setImageResource(R.mipmap.ic_launcher_round);
+            }
         } else {
+            Log.d(TAG, "No hay imagen disponible");
             ivPlantImage.setImageResource(R.mipmap.ic_launcher_round);
         }
 
         tvPlantName.setText(plantName != null ? plantName : "Desconocido");
         tvConfidence.setText(String.format("Confianza: %.1f%%", confidence * 100));
 
-        // Guardar en el historial con la imagen
+        // Guardar en el historial con la imagen y enviar predicción a la API
         if (plantName != null && !plantName.isEmpty()) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     String username = authService.getUsername();
-                    String imagePath = null;
+                    String savedImagePath = null;
 
                     // Guardar la imagen capturada si existe
-                    if (capturedImage != null) {
-                        imagePath = ImageUtils.saveBitmapToInternalStorage(
-                            ResultActivity.this, capturedImage, plantName);
+                    if (loadedImage != null) {
+                        savedImagePath = ImageUtils.saveBitmapToInternalStorage(
+                            ResultActivity.this, loadedImage, plantName);
                     }
 
-                    dbHelper.addIdentification(plantName, confidence, imagePath, username);
+                    // Guardar en historial local
+                    dbHelper.addIdentification(plantName, confidence, savedImagePath, username);
+
+                    // Enviar predicción a la API REST
+                    final String finalImagePath = savedImagePath;
+                    sendPredictionToServer(plantName, confidence, finalImagePath);
                 }
             }).start();
         }
@@ -162,6 +187,35 @@ public class ResultActivity extends BaseActivity {
             }
         });
     }
+    
+    /**
+     * Carga un Bitmap desde una ruta de archivo con escalado para evitar OutOfMemory
+     */
+    private Bitmap loadBitmapFromPath(String path) {
+        try {
+            // Obtener dimensiones sin cargar la imagen
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, options);
+            
+            // Calcular factor de escala (máximo 800px)
+            int maxSize = 800;
+            int scaleFactor = 1;
+            while ((options.outWidth / scaleFactor) > maxSize || 
+                   (options.outHeight / scaleFactor) > maxSize) {
+                scaleFactor *= 2;
+            }
+            
+            // Cargar imagen escalada
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = scaleFactor;
+            
+            return BitmapFactory.decodeFile(path, options);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al cargar imagen: " + e.getMessage());
+            return null;
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
@@ -170,5 +224,30 @@ public class ResultActivity extends BaseActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Envía la predicción del modelo IA a la API REST
+     */
+    private void sendPredictionToServer(String plantName, float confidence, String imagePath) {
+        predictionService.savePrediction(plantName, confidence, imagePath,
+                new PredictionService.PredictionCallback() {
+                    @Override
+                    public void onSuccess(PredictionResponse response) {
+                        Log.d(TAG, "Predicción enviada al servidor: " + response.getMessage());
+                        runOnUiThread(() -> {
+                            Toast.makeText(ResultActivity.this,
+                                    "Predicción sincronizada con el servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        Log.e(TAG, "Error al enviar predicción: " + errorMessage);
+                        // No mostramos error al usuario para no interrumpir la experiencia
+                        // La predicción se guardó localmente de todas formas
+                    }
+                });
     }
 }

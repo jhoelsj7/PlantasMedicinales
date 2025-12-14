@@ -1,11 +1,20 @@
 package com.tuapp.plantasmedicinales.utils;
 
 public class Constants {
-    // API Configuration
-    public static final String BASE_URL = "http://192.168.18.26/plantas_api/";
+    // API Configuration (actualizar si cambia la IP)
+    public static final String BASE_URL = "http://192.168.18.35/plantas_api/";
+    public static final String API_URL = BASE_URL + "api/";
 
-    // CNN Model Configuration
-    public static final String MODEL_PATH = "modelo_plantas_96acc.tflite";
+    // API Endpoints
+    public static final String ENDPOINT_PLANTS = "plants.php";
+    public static final String ENDPOINT_LOGIN = "login.php";
+    public static final String ENDPOINT_PREDICTIONS = "predictions.php";
+    public static final String ENDPOINT_GET_PLANT = "get_plant.php";
+    public static final String ENDPOINT_SEARCH_PLANTS = "search_plants.php";
+    public static final String ENDPOINT_MODEL_VERSION = "model_version.php";
+
+    // CNN Model Configuration (TFLite)
+    public static final String MODEL_PATH = "plantas_medicinales_final.tflite";
     public static final String LABEL_PATH = "labels.txt";
     public static final int INPUT_SIZE = 224;
     public static final float CONFIDENCE_THRESHOLD = 0.6f;

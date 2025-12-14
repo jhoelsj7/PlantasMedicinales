@@ -1,12 +1,12 @@
 package com.tuapp.plantasmedicinales.service;
 
 import android.content.Context;
+import android.util.Log;
 import com.tuapp.plantasmedicinales.ApiService;
 import com.tuapp.plantasmedicinales.Plant;
 import com.tuapp.plantasmedicinales.RetrofitClient;
 import com.tuapp.plantasmedicinales.database.AppDatabase;
 import com.tuapp.plantasmedicinales.database.PlantDao;
-import com.tuapp.plantasmedicinales.model.PlantsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 public class PlantService {
+    private static final String TAG = "PlantService";
     private ApiService apiService;
     private PlantDao plantDao;
     private Context context;
@@ -25,20 +26,29 @@ public class PlantService {
     }
 
     public void syncPlants(final SyncCallback callback) {
+        // Usar el endpoint que devuelve array directo [...]
         Call<List<Plant>> call = apiService.getAllPlants();
         call.enqueue(new Callback<List<Plant>>() {
             @Override
             public void onResponse(Call<List<Plant>> call, Response<List<Plant>> response) {
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    // El dashboard devuelve array directo, no wrapper
-                    savePlantsToDatabase(response.body(), callback);
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Plant> plants = response.body();
+                    if (plants != null && !plants.isEmpty()) {
+                        Log.d(TAG, "Plantas recibidas del servidor: " + plants.size());
+                        savePlantsToDatabase(plants, callback);
+                    } else {
+                        Log.w(TAG, "Respuesta vacía del servidor, cargando desde BD local");
+                        loadPlantsFromDatabase(callback);
+                    }
                 } else {
+                    Log.e(TAG, "Error en respuesta: " + response.code());
                     loadPlantsFromDatabase(callback);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Plant>> call, Throwable t) {
+                Log.e(TAG, "Error de conexión: " + t.getMessage());
                 loadPlantsFromDatabase(callback);
             }
         });
@@ -48,13 +58,30 @@ public class PlantService {
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                plantDao.deleteAllPlants();
-                for (Plant plant : plants) {
-                    plant.setSynced(true);
-                }
-                plantDao.insertPlants(plants);
-                if (callback != null) {
-                    callback.onSuccess(plants);
+                try {
+                    // Limpiar completamente la base de datos local
+                    plantDao.deleteAllPlants();
+                    Log.d(TAG, "Base de datos local limpiada");
+
+                    // Insertar plantas del servidor
+                    for (Plant plant : plants) {
+                        plant.setSynced(true);
+                    }
+                    plantDao.insertPlants(plants);
+                    Log.d(TAG, "Insertadas " + plants.size() + " plantas del servidor");
+
+                    // Verificar inserción
+                    List<Plant> verificacion = plantDao.getAllPlants();
+                    Log.d(TAG, "Verificación: BD local tiene " + verificacion.size() + " plantas");
+
+                    if (callback != null) {
+                        callback.onSuccess(plants);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error al guardar plantas: " + e.getMessage());
+                    if (callback != null) {
+                        callback.onError("Error al guardar: " + e.getMessage());
+                    }
                 }
             }
         });
