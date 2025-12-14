@@ -1,217 +1,136 @@
-# 🌿 Dashboard Backend - Plantas Medicinales
+# Plantas Medicinales - App Android con IA
 
-## 📋 PASOS DE INSTALACIÓN
+Aplicación Android para identificar plantas medicinales usando Inteligencia Artificial (TensorFlow Lite) y gestionar información sobre sus propiedades curativas.
 
-### 1️⃣ Mover carpeta al servidor web
+## Características
 
-**IMPORTANTE:** Debes mover esta carpeta `plantas_api` a la carpeta de XAMPP:
+- **Identificación por IA**: Reconoce plantas medicinales mediante CNN con 96% de precisión
+- **Captura de Imágenes**: Toma fotos con la cámara o selecciona desde galería
+- **Base de Datos Local**: Almacenamiento offline con Room Database
+- **Sincronización**: Actualiza datos desde API REST
+- **Búsqueda Avanzada**: Busca plantas por nombre común, científico o usos medicinales
+- **Detalles Completos**: Información detallada sobre cada planta
+- **Autenticación**: Sistema de login seguro
 
-```
-DESDE: C:\Users\yovan\plantas_api
-HASTA: C:\xampp\htdocs\plantas_api
-```
+## Arquitectura
 
-### 2️⃣ Crear la base de datos
-
-1. Abre **XAMPP Control Panel**
-2. Inicia **Apache** y **MySQL**
-3. Abre phpMyAdmin: `http://localhost/phpmyadmin`
-4. Click en **"SQL"** en el menú superior
-5. Copia TODO el contenido del archivo `database.sql`
-6. Pégalo en el editor SQL
-7. Click en **"Continuar"**
-
-### 3️⃣ Configurar la IP del servidor
-
-Edita el archivo `config.php` línea 16:
-
-```php
-// Cambia esta IP a la de tu servidor
-define('BASE_URL', 'http://TU_IP_AQUI/plantas_api/');
-
-// Por ejemplo:
-define('BASE_URL', 'http://192.168.18.24/plantas_api/');
-```
-
-**¿Cómo saber tu IP?**
-
-Abre CMD y ejecuta:
-```bash
-ipconfig
-```
-
-Busca **"Dirección IPv4"** en tu adaptador de red WiFi/Ethernet.
-
-### 4️⃣ Agregar imágenes de plantas
-
-Coloca las imágenes de las plantas en la carpeta `uploads/`:
+### Capas de la Aplicación
 
 ```
-plantas_api/uploads/
-├── manzanilla.jpg
-├── eucalipto.jpg
-├── aloe_vera.jpg
-├── hierba_buena.jpg
-├── romero.jpg
-├── lavanda.jpg
-├── jengibre.jpg
-├── valeriana.jpg
-├── tila.jpg
-└── calendula.jpg
+├── Presentation Layer
+│   ├── Activities (LoginActivity, MainActivity, CameraActivity, etc.)
+│   └── Adapters (PlantAdapter)
+│
+├── Business Logic Layer
+│   ├── Controllers (PlantController, IdentificationController, SyncController)
+│   └── Services (AuthService, PlantService, CNNService)
+│
+├── Data Layer
+│   ├── Database (Room: AppDatabase, PlantDao)
+│   ├── Models (Plant, Prediction, LoginRequest, LoginResponse)
+│   └── API (Retrofit: ApiService, RetrofitClient)
+│
+└── Utils
+    ├── Constants
+    ├── ImageUtils (Glide)
+    ├── NetworkUtils
+    └── ValidationUtils
 ```
 
-**IMPORTANTE:** Los nombres de archivo deben coincidir exactamente con los que están en la base de datos.
+## Tecnologías Utilizadas
 
-### 5️⃣ Probar los endpoints
+- **Lenguaje**: Java
+- **SDK**: Android 21-36 (Android 5.0 - 14)
+- **IA/ML**: TensorFlow Lite 2.13.0
+- **Base de Datos**: Room 2.5.2
+- **Networking**: Retrofit 2.9.0 + OkHttp 4.10.0
+- **Imágenes**: Glide 4.15.1
+- **Permisos**: Dexter 6.2.3
 
-Abre tu navegador y prueba:
+## Estructura del Proyecto
 
-**Test 1: Listar plantas**
 ```
-http://localhost/plantas_api/plants.php
-```
-
-Debe retornar un JSON con el array de plantas.
-
-**Test 2: Login (usar Postman o cURL)**
-```bash
-curl -X POST http://localhost/plantas_api/login.php \
-  -H "Content-Type: application/json" \
-  -d "{\"username\":\"testuser\",\"password\":\"test123\"}"
-```
-
-Debe retornar:
-```json
-{
-  "success": true,
-  "message": "Login exitoso",
-  "data": {
-    "token": "abc123...",
-    "user": {...}
-  }
-}
+PlantasMedicinales/
+├── app/                    # Aplicación Android
+│   └── src/main/
+│       ├── java/           # Código fuente Java
+│       ├── res/            # Recursos (layouts, strings, etc.)
+│       └── assets/         # Modelo TFLite y labels
+│
+└── plantas_api/            # Backend PHP (API REST)
+    ├── api/                # Endpoints de la API
+    ├── config/             # Configuración
+    ├── controllers/        # Controladores
+    ├── models/             # Modelos de datos
+    ├── views/admin/        # Panel de administración
+    └── public/             # Archivos públicos (uploads)
 ```
 
-### 6️⃣ Configurar la app Android
+## Instalación
 
-Edita en tu proyecto Android el archivo `RetrofitClient.java`:
+### Backend (API PHP)
 
+1. **Mover carpeta al servidor web**
+```
+Copiar plantas_api/ a C:\xampp\htdocs\plantas_api
+```
+
+2. **Crear la base de datos**
+   - Abre XAMPP e inicia Apache y MySQL
+   - Abre phpMyAdmin: `http://localhost/phpmyadmin`
+   - Ejecuta el contenido de `database.sql`
+
+3. **Configurar**
+   - Copia `config/config.example.php` a `config/config.php`
+   - Edita la IP y credenciales de BD
+
+### App Android
+
+1. **Configurar la API**
+   - Editar `RetrofitClient.java` línea 12:
 ```java
-private static final String BASE_URL = "http://TU_IP_AQUI/plantas_api/";
+private static final String BASE_URL = "http://TU_IP_LOCAL/plantas_api/";
 ```
 
-**IMPORTANTE:** Usa la misma IP que configuraste en `config.php`.
+2. **Sincronizar y compilar**
+```bash
+./gradlew sync
+./gradlew assembleDebug
+```
 
----
+## Credenciales de Prueba
 
-## 📡 ENDPOINTS DISPONIBLES
+- **Usuario**: `testuser` / **Contraseña**: `test123`
+- **Admin**: `admin` / **Contraseña**: `test123`
+
+## API Endpoints
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| POST | `/login.php` | Autenticación de usuarios |
-| GET | `/plants.php` | Listar todas las plantas |
-| GET | `/get_plant.php?id=X` | Obtener una planta específica |
-| GET | `/model_version.php` | Versión actual del modelo IA |
+| POST | `/api/login.php` | Autenticación |
+| GET | `/api/plants.php` | Listar plantas |
+| GET | `/api/get_plant.php?id=X` | Obtener planta |
+| POST | `/api/add_plant.php` | Agregar planta |
+| PUT | `/api/update_plant.php` | Actualizar planta |
+| DELETE | `/api/delete_plant.php` | Eliminar planta |
+| GET | `/api/model_version.php` | Versión del modelo IA |
+
+## Plantas Reconocidas
+
+El modelo puede identificar: Astromeria, Muña, Manzanilla, Aloe Vera, Menta, Eucalipto, Romero, Jengibre, Lavanda, Boldo, Uña de Gato, Hierba Luisa.
+
+## Modelo de IA
+
+- **Arquitectura**: CNN (Convolutional Neural Network)
+- **Precisión**: 96%
+- **Input Size**: 224x224 pixels
+- **Framework**: TensorFlow Lite
+- **Tamaño**: 2.4 MB
+
+## Licencia
+
+Este proyecto es parte de un trabajo académico.
 
 ---
 
-## 👤 CREDENCIALES DE PRUEBA
-
-**Usuario de prueba:**
-- Username: `testuser`
-- Password: `test123`
-
-**Administrador:**
-- Username: `admin`
-- Password: `test123`
-
----
-
-## 🔍 TROUBLESHOOTING
-
-### ❌ Error: "Error de conexión a base de datos"
-
-**Solución:**
-1. Verifica que MySQL esté corriendo en XAMPP
-2. Verifica credenciales en `config.php` (líneas 11-14)
-3. Revisa el archivo `logs/db_errors.log`
-
-### ❌ Error: "CORS error" en Android
-
-**Solución:**
-Ya están configurados los headers CORS en `config.php`. Si persiste, verifica que Apache tenga habilitado `mod_headers`.
-
-### ❌ Imágenes no se muestran
-
-**Solución:**
-1. Verifica que las imágenes existan en `uploads/`
-2. Verifica que los nombres coincidan con los de la BD
-3. Verifica que la URL base sea correcta
-
----
-
-## 📂 ESTRUCTURA DE CARPETAS
-
-```
-plantas_api/
-├── config.php              # Configuración general
-├── helpers.php             # Funciones auxiliares
-├── login.php               # Endpoint de login
-├── plants.php              # Endpoint de plantas
-├── get_plant.php           # Endpoint de planta específica
-├── model_version.php       # Endpoint de versión de modelo
-├── database.sql            # Script SQL
-├── README.md               # Este archivo
-│
-├── uploads/                # Imágenes de plantas
-│   └── (tus imágenes aquí)
-│
-├── uploads/predictions/    # Imágenes de identificaciones
-│
-├── logs/                   # Logs del sistema
-│   ├── api.log
-│   └── db_errors.log
-│
-└── models/                 # Modelos de TensorFlow
-    └── modelo_plantas_96acc.tflite
-```
-
----
-
-## ✅ CHECKLIST
-
-- [ ] Carpeta movida a `C:\xampp\htdocs\plantas_api`
-- [ ] Apache y MySQL corriendo en XAMPP
-- [ ] Base de datos `plantas_db` creada
-- [ ] IP configurada en `config.php`
-- [ ] Imágenes subidas a `uploads/`
-- [ ] Test de `plants.php` exitoso
-- [ ] Test de `login.php` exitoso
-- [ ] App Android configurada con la IP correcta
-
----
-
-## 🎯 PRÓXIMOS PASOS
-
-Una vez que el dashboard funcione:
-
-1. **Sincronizar app Android:**
-   - Abre la app
-   - Haz pull-to-refresh en la lista de plantas
-   - Verifica que se sincronicen desde el servidor
-
-2. **Probar identificación:**
-   - Toma una foto de una planta
-   - Verifica que el resultado muestre los campos:
-     - `preparation`
-     - `precautions`
-
-3. **Implementar gestión de inactividad:**
-   - Cierre de sesión después de 3 segundos de inactividad
-   - Tooltips en flechas de navegación
-
----
-
-**¿Necesitas ayuda?** Revisa los logs en `logs/` para depurar errores.
-
-¡Tu sistema está listo para usarse! 🚀
+**Versión**: 1.0 | **Última actualización**: 2025

@@ -1,3 +1,4 @@
+# === PHP Backend ===
 # Dependencies
 /vendor/
 
@@ -11,15 +12,31 @@
 /public/uploads/*
 !/public/uploads/.gitkeep
 
-# IDE
+# === Android ===
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# === IDE ===
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# OS files
+# === OS ===
 .DS_Store
 Thumbs.db
 
-# Misc
+# === Misc ===
 nul

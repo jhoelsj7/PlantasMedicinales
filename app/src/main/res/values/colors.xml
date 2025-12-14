@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colores originales -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- 🌿 TEMA PLANTAS MEDICINALES 🌿 -->
+
+    <!-- Verde Principal -->
+    <color name="green_primary">#4CAF50</color>         <!-- Verde hoja vibrante -->
+    <color name="green_primary_dark">#2E7D32</color>    <!-- Verde oscuro para toolbar -->
+    <color name="green_primary_light">#81C784</color>   <!-- Verde claro para acentos -->
+
+    <!-- Verde Secundario -->
+    <color name="green_accent">#66BB6A</color>          <!-- Verde medio -->
+    <color name="green_light_bg">#F1F8E9</color>        <!-- Fondo verde muy claro -->
+    <color name="green_soft">#A5D6A7</color>            <!-- Verde suave para cards -->
+
+    <!-- Colores Complementarios -->
+    <color name="brown_earth">#795548</color>           <!-- Marrón tierra -->
+    <color name="brown_light">#A1887F</color>           <!-- Marrón claro -->
+    <color name="cream">#FFF8E1</color>                 <!-- Crema -->
+    <color name="mint">#B2DFDB</color>                  <!-- Verde menta -->
+
+    <!-- Estados -->
+    <color name="success">#4CAF50</color>               <!-- Verde éxito -->
+    <color name="warning">#FF9800</color>               <!-- Naranja advertencia -->
+    <color name="error">#F44336</color>                 <!-- Rojo error -->
+    <color name="info">#2196F3</color>                  <!-- Azul info -->
+
+    <!-- Grises -->
+    <color name="grey_light">#F5F5F5</color>            <!-- Gris muy claro -->
+    <color name="grey_medium">#9E9E9E</color>           <!-- Gris medio -->
+    <color name="grey_dark">#424242</color>             <!-- Gris oscuro -->
+
+    <!-- Transparencias -->
+    <color name="overlay_dark">#80000000</color>        <!-- Negro 50% -->
+    <color name="overlay_light">#80FFFFFF</color>       <!-- Blanco 50% -->
+
+    <!-- 🎨 COLORES GLASSMORPHISM LOGIN 🎨 -->
+    <color name="glass_white_15">#26FFFFFF</color>      <!-- Blanco 15% - Fondo formulario -->
+    <color name="glass_white_25">#40FFFFFF</color>      <!-- Blanco 25% - Fondo inputs -->
+    <color name="glass_white_30">#4DFFFFFF</color>      <!-- Blanco 30% - Bordes -->
+    <color name="glass_white_70">#B3FFFFFF</color>      <!-- Blanco 70% - Placeholders -->
+    <color name="white_pure">#FFFFFF</color>            <!-- Blanco puro - Texto -->
+    <color name="white_blue">#F0F8FF</color>            <!-- Blanco azulado -->
+    <color name="blue_bright">#1E90FF</color>           <!-- Azul brillante - Botón -->
+    <color name="blue_focus">#0066CC</color>            <!-- Azul focus - Borde inputs -->
+    <color name="blue_button_80">#CC1E90FF</color>      <!-- Azul botón 80% -->
+    <color name="text_dark_contrast">#2C3E50</color>    <!-- Texto oscuro contraste -->
+
+    <!-- 🎨 COLORES CARDS MAIN 🎨 -->
+    <color name="mint_start">#C8E6C9</color>            <!-- Verde menta inicio -->
+    <color name="mint_end">#A5D6A7</color>              <!-- Verde menta fin -->
+    <color name="coral_start">#FF8A80</color>           <!-- Coral inicio -->
+    <color name="coral_end">#FF5252</color>             <!-- Coral fin -->
+    <color name="blue_start">#5C8DAA</color>            <!-- Azul inicio -->
+    <color name="blue_end">#3D6B87</color>              <!-- Azul fin -->
+    <color name="beige_start">#D7CCC8</color>           <!-- Beige inicio -->
+    <color name="beige_end">#BCAAA4</color>             <!-- Beige fin -->
+    <color name="badge_green">#7FD146</color>           <!-- Badge verde -->
+    <color name="green_dark">#4A7C59</color>            <!-- Verde oscuro -->
+</resources>

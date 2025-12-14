@@ -1,0 +1,26 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- TEMA PARA MODO NOCTURNO - FORZADO A MODO CLARO -->
+    <!-- Esto evita que la app cambie cuando el sistema está en modo oscuro -->
+    <style name="Theme.PlantasMedicinales" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryVariant">@color/green_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/green_accent</item>
+        <item name="colorSecondaryVariant">@color/green_primary_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">@color/green_primary_dark</item>
+
+        <!-- Forzar modo claro siempre -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+
+    <!-- Tema base igual al modo claro -->
+    <style name="Base.Theme.PlantasMedicinales" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryVariant">@color/green_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/green_accent</item>
+        <item name="colorSecondaryVariant">@color/green_primary_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+    </style>
+</resources>
