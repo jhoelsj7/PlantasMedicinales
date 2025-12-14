@@ -1,0 +1,13 @@
+{
+    "name": "plantas/api",
+    "description": "API de Plantas Medicinales",
+    "require": {
+        "php": ">=7.4",
+        "tecnickcom/tcpdf": "^6.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

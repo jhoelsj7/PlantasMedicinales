@@ -1,0 +1,25 @@
+# Dependencies
+/vendor/
+
+# Logs
+/logs/*.log
+
+# Config with credentials (use config.example.php as template)
+/config/config.php
+
+# Uploads
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+nul

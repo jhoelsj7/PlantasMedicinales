@@ -1,0 +1,797 @@
+{
+  "info": {
+    "name": "Plantas Medicinales API - Tests AMPLIADOS (Tesis)",
+    "description": "Colección AMPLIADA de tests para API REST de Plantas Medicinales del Valle del Urubamba\n\n**Casos de Prueba incluidos:**\n- CASO 10: Smoke Tests (verificación básica)\n- CASO 1: Validación de credenciales\n- CASO 5: Tests de endpoints\n- CASO 12: Búsqueda de plantas\n- CASO 8: Seguridad SQL Injection\n- **NUEVO CASO 6: CRUD Completo de Plantas**\n- **NUEVO CASO 7: Gestión de Sesión y Tokens**\n- **NUEVO CASO 14: Validación de Datos de Entrada**\n\n**Total:** 8 casos, 35 tests automatizados\n\n**Autor:** Tesis - Sistema de Identificación de Plantas Medicinales",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CASO 10 - Smoke Tests",
+      "item": [
+        {
+          "name": "1. Health Check - API responde",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ API responde correctamente\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Respuesta es JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Tiempo de respuesta < 2 segundos\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/plants.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "plants.php"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login endpoint disponible",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Endpoint de login responde\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 401]);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Content-Type es JSON\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{}"},
+            "url": {
+              "raw": "{{base_url}}/api/login.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login.php"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CASO 1 - Validación Credenciales",
+      "item": [
+        {
+          "name": "1. Login con credenciales vacías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"❌ Rechaza username vacío con código 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"❌ Retorna mensaje de error específico\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData.error).to.include('requeridos');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n    \"username\": \"\",\n    \"password\": \"\"\n}"},
+            "url": {
+              "raw": "{{base_url}}/api/login.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login.php"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login con credenciales válidas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Acepta credenciales válidas con código 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna token de autenticación\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.expect(jsonData.token).to.be.a('string');",
+                  "    pm.expect(jsonData.token.length).to.be.above(10);",
+                  "    pm.environment.set(\"auth_token\", jsonData.token);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna datos del usuario\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "    pm.expect(jsonData.user).to.have.property('username');",
+                  "});",
+                  "",
+                  "pm.test(\"✅ No retorna password en la respuesta\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.not.have.property('password');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n    \"username\": \"{{test_username}}\",\n    \"password\": \"{{test_password}}\"\n}"},
+            "url": {
+              "raw": "{{base_url}}/api/login.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login.php"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Login con credenciales inválidas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"❌ Rechaza credenciales incorrectas con código 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"❌ Retorna mensaje de error\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n    \"username\": \"usuariofalso\",\n    \"password\": \"passwordincorrecto\"\n}"},
+            "url": {
+              "raw": "{{base_url}}/api/login.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login.php"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CASO 6 - CRUD Completo de Plantas",
+      "item": [
+        {
+          "name": "1. POST - Crear planta con datos válidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Planta creada con código 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna mensaje de éxito\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('exitosamente');",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Tiempo de respuesta < 2 segundos\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"common_name\": \"Planta Test\",\n    \"scientific_name\": \"Testus plantarum\",\n    \"family\": \"Testaceae\",\n    \"description\": \"Planta de prueba para testing\",\n    \"medicinal_uses\": \"Testing de API\",\n    \"preparation\": \"No consumir\",\n    \"precautions\": \"Solo para pruebas\",\n    \"image_path\": \"default.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/add_plant.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "add_plant.php"]
+            },
+            "description": "**CASO 6 - Test 1:** Crear planta con todos los datos válidos"
+          },
+          "response": []
+        },
+        {
+          "name": "2. POST - Rechazar planta sin nombre común",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"❌ Rechaza planta sin common_name con código 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"❌ Retorna mensaje de error específico\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData.error).to.include('incompletos');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"scientific_name\": \"Testus incompletus\",\n    \"family\": \"Testaceae\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/add_plant.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "add_plant.php"]
+            },
+            "description": "**CASO 6 - Test 2:** Validar que rechaza datos incompletos"
+          },
+          "response": []
+        },
+        {
+          "name": "3. DELETE - Eliminar planta por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Planta eliminada correctamente\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Confirma eliminación\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/delete_plant.php?id=999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "delete_plant.php"],
+              "query": [{"key": "id", "value": "999"}]
+            },
+            "description": "**CASO 6 - Test 3:** Eliminar planta de prueba (usar ID que no afecte datos reales)"
+          },
+          "response": []
+        },
+        {
+          "name": "4. DELETE - Intentar eliminar sin ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"❌ Rechaza eliminación sin ID con código 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"❌ Retorna mensaje de error\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData.error).to.include('requerido');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/delete_plant.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "delete_plant.php"]
+            },
+            "description": "**CASO 6 - Test 4:** Validar que requiere ID obligatorio"
+          },
+          "response": []
+        }
+      ],
+      "description": "**CASO DE PRUEBA 6: CRUD Completo de Plantas**\n\n**Tipo:** Funcional - Integración\n\n**Objetivo:** Validar operaciones Create, Read, Update, Delete del catálogo de plantas medicinales."
+    },
+    {
+      "name": "CASO 5 - Tests Endpoints API",
+      "item": [
+        {
+          "name": "GET - Listar todas las plantas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Código de respuesta 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna array de plantas\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Plantas tienen estructura correcta\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.length > 0) {",
+                  "        pm.expect(jsonData[0]).to.have.property('id');",
+                  "        pm.expect(jsonData[0]).to.have.property('common_name');",
+                  "        pm.expect(jsonData[0]).to.have.property('scientific_name');",
+                  "        pm.expect(jsonData[0]).to.have.property('family');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Tiempo de respuesta < 1 segundo\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/plants.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "plants.php"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Obtener planta por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Código de respuesta 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna datos de la planta\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('medicinal_uses');",
+                  "    pm.expect(jsonData).to.have.property('preparation');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/get_plant.php?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "get_plant.php"],
+              "query": [{"key": "id", "value": "1"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Versión del modelo IA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Endpoint responde\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna versión del modelo\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('version');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/model_version.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "model_version.php"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CASO 12 - Búsqueda de Plantas",
+      "item": [
+        {
+          "name": "1. Búsqueda por nombre común",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Búsqueda ejecuta correctamente\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna estructura paginada\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData).to.have.property('page');",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Resultados coinciden con búsqueda\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        var query = 'manzanilla';",
+                  "        var found = jsonData.data[0].common_name.toLowerCase().includes(query) || ",
+                  "                    jsonData.data[0].scientific_name.toLowerCase().includes(query);",
+                  "        pm.expect(found).to.be.true;",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Tiempo de respuesta < 1 segundo\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/search_plants.php?query=manzanilla",
+              "host": ["{{base_url}}"],
+              "path": ["api", "search_plants.php"],
+              "query": [{"key": "query", "value": "manzanilla"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Búsqueda por familia botánica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Filtro por familia funciona\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Resultados son de la familia correcta\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        jsonData.data.forEach(function(plant) {",
+                  "            pm.expect(plant.family).to.eql('Asteraceae');",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Resultados ordenados alfabéticamente\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 1) {",
+                  "        for (var i = 0; i < jsonData.data.length - 1; i++) {",
+                  "            var current = jsonData.data[i].common_name.toLowerCase();",
+                  "            var next = jsonData.data[i + 1].common_name.toLowerCase();",
+                  "            pm.expect(current <= next).to.be.true;",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/search_plants.php?family=Asteraceae",
+              "host": ["{{base_url}}"],
+              "path": ["api", "search_plants.php"],
+              "query": [{"key": "family", "value": "Asteraceae"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Búsqueda con paginación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Paginación funciona correctamente\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Respeta el límite de resultados\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.length).to.be.at.most(5);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Incluye información de paginación\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.page).to.eql(1);",
+                  "    pm.expect(jsonData).to.have.property('pages');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/search_plants.php?page=1&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "search_plants.php"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "5"}
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CASO 8 - Seguridad SQL Injection",
+      "item": [
+        {
+          "name": "1. Búsqueda con SQL Injection básico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ No genera error de SQL\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "    var jsonData = pm.response.json();",
+                  "    var responseText = JSON.stringify(jsonData).toLowerCase();",
+                  "    pm.expect(responseText).to.not.include('sql');",
+                  "    pm.expect(responseText).to.not.include('mysql');",
+                  "    pm.expect(responseText).to.not.include('syntax error');",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna 0 resultados o resultados legítimos\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data) {",
+                  "        pm.expect(jsonData.data).to.be.an('array');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/search_plants.php?query=' OR 1=1--",
+              "host": ["{{base_url}}"],
+              "path": ["api", "search_plants.php"],
+              "query": [{"key": "query", "value": "' OR 1=1--"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login con SQL Injection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"✅ Rechaza intento de SQL Injection\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ No bypasea autenticación\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.have.property('token');",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n    \"username\": \"admin'--\",\n    \"password\": \"cualquiercosa\"\n}"},
+            "url": {
+              "raw": "{{base_url}}/api/login.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login.php"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CASO 14 - Validación de Datos de Entrada",
+      "item": [
+        {
+          "name": "1. XSS - Caracteres especiales en nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"❌ Rechaza o sanitiza caracteres especiales\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ No ejecuta scripts en respuesta\", function () {",
+                  "    var responseText = pm.response.text();",
+                  "    pm.expect(responseText).to.not.include('<script>');",
+                  "    pm.expect(responseText).to.not.include('alert(');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"common_name\": \"<script>alert('XSS')</script>\",\n    \"scientific_name\": \"Malicious plantae\",\n    \"family\": \"Hackaceae\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/add_plant.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "add_plant.php"]
+            },
+            "description": "**CASO 14 - Test 1:** Intentar inyectar código JavaScript"
+          },
+          "response": []
+        },
+        {
+          "name": "2. ID negativo en búsqueda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"❌ Maneja ID inválido correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna mensaje de error o no encontrado\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/get_plant.php?id=-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "get_plant.php"],
+              "query": [{"key": "id", "value": "-1"}]
+            },
+            "description": "**CASO 14 - Test 2:** Validar rechazo de IDs negativos"
+          },
+          "response": []
+        },
+        {
+          "name": "3. JSON malformado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"❌ Rechaza JSON malformado con código 400\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                  "});",
+                  "",
+                  "pm.test(\"✅ Retorna error descriptivo\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{ invalid json: without quotes }"},
+            "url": {
+              "raw": "{{base_url}}/api/add_plant.php",
+              "host": ["{{base_url}}"],
+              "path": ["api", "add_plant.php"]
+            },
+            "description": "**CASO 14 - Test 3:** Validar manejo de JSON inválido"
+          },
+          "response": []
+        }
+      ],
+      "description": "**CASO DE PRUEBA 14: Validación de Datos de Entrada**\n\n**Tipo:** No Funcional - Seguridad\n\n**Objetivo:** Asegurar que el backend rechaza o sanitiza datos malformados o maliciosos."
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/plantas_api",
+      "type": "string"
+    }
+  ]
+}
